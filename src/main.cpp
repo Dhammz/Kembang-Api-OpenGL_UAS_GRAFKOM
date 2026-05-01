@@ -31,6 +31,11 @@ constexpr int kWindowHeight = 720;
 constexpr float kGravity = -7.5f;
 constexpr std::size_t kMaxParticles = 12000;
 constexpr float kSpawnInterval = 0.6f;
+constexpr float kTrailLifeThreshold = 0.5f;
+constexpr float kTrailSizeMin = 1.5f;
+constexpr float kTrailSizeMax = 6.5f;
+constexpr float kBurstSizeMin = 5.5f;
+constexpr float kBurstSizeMax = 12.5f;
 
 struct Particle {
     glm::vec3 position{};
@@ -116,8 +121,8 @@ public:
           distVelY_(17.5f, 22.5f),
           distColor_(0.35f, 1.0f),
           distExplodeY_(18.0f, 26.0f),
-          distParticleSpeed_(2.5f, 11.5f),
-          distLife_(1.4f, 2.8f),
+          distParticleSpeed_(8.0f, 24.0f),
+          distLife_(1.9f, 3.3f),
           distJitter_(-0.35f, 0.35f),
           distShape_(0.0f, 1.0f),
           distTrailLife_(0.18f, 0.38f) {
@@ -165,8 +170,13 @@ public:
             p.position += p.velocity * dt;
 
             const float t = p.life / p.maxLife;
-            p.color.a = std::max(0.0f, t * t);
-            p.size = 2.0f + 8.0f * t;
+            p.color.a = std::max(0.0f, std::pow(t, 0.72f));
+
+            if (p.maxLife <= kTrailLifeThreshold) {
+                p.size = kTrailSizeMin + (kTrailSizeMax - kTrailSizeMin) * t;
+            } else {
+                p.size = kBurstSizeMin + (kBurstSizeMax - kBurstSizeMin) * t;
+            }
         }
     }
 
@@ -222,7 +232,7 @@ private:
     }
 
     void ExplodeRocket(const Rocket& rocket) {
-        constexpr int kParticlesPerExplosion = 420;
+        constexpr int kParticlesPerExplosion = 900;
 
         for (int i = 0; i < kParticlesPerExplosion; ++i) {
             Particle* slot = FindInactiveParticle();
@@ -256,9 +266,9 @@ private:
             slot->maxLife = distLife_(rng_);
             slot->life = slot->maxLife;
 
-            const float sparkShift = RandomRange(0.55f, 1.2f);
+            const float sparkShift = RandomRange(0.85f, 1.35f);
             slot->color = glm::vec4(rocket.burstColor * sparkShift, 1.0f);
-            slot->size = RandomRange(4.0f, 10.0f);
+            slot->size = RandomRange(6.5f, 11.5f);
         }
 
 #if defined(_WIN32)

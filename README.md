@@ -56,8 +56,3 @@ Alur simulasi:
 5. Alpha dan ukuran partikel dipudarkan seiring sisa umur.
 6. Partikel mati dinonaktifkan dan slot-nya dipakai ulang.
 
-## Catatan Akademik
-Project ini bisa dijadikan dasar laporan UAS untuk topik:
-- implementasi particle system real-time,
-- visual effects pada grafik komputer,
-- pemodelan gerak berbasis fisika sederhana di OpenGL.
